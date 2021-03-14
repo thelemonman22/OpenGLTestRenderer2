@@ -14,6 +14,7 @@ using namespace glm;
 
 #include "LoadShaders.h"
 #include "VertexBuffer.h"
+#include "BMPLoader.h"
 
 int main(void)
 {
@@ -63,8 +64,7 @@ int main(void)
 	glBindVertexArray(VertexArrayID);
 
 	// Create and compile our GLSL program from the shaders
-	unsigned int programID = LoadShaders("res\\VertexShader.txt", "res\\FragmentShader.txt");
-
+	unsigned int programID = LoadShaders("res\\shaders\\VertexShader.txt", "res\\shaders\\FragmentShader.txt");
 	unsigned int MatrixID = glGetUniformLocation(programID, "MVP");
 
 	//Projection matrix : 45 field of view, 4:3 aspect ratio, display range : 0.1 units to 100 units;
@@ -76,9 +76,7 @@ int main(void)
 	glm::mat4 View = glm::lookAt(
 		glm::vec3(4,3,3),  //Camera is at 4,3,3 in world space
 		glm::vec3(0,0,0), //looks up the origin
-		glm::vec3(0,1,0) //Head is upright (set 0, -1, 0 to look upside-down);
-
-
+		glm::vec3(0,1,0) //Head is upright (set 0, -1, 0 to look upside-
 	);
 
 	//Model matrix :  an identity matrix (model will be at the origin)
@@ -87,8 +85,11 @@ int main(void)
 	//Our MVP, matrix multiplication is reverse, so this executes "Model -> View -> Projection"
 	glm::mat4 MVP = Projection * View * Model;
 	
+	unsigned int Texture = BMPLoader("res\\textures\\uvtemplate.bmp").getTextureID();
 
-	 float positions[] = {
+	unsigned int TextureID = glGetUniformLocation(programID, "myTextureSampler");
+
+	static const float positions[] = {
 	-1.0f,-1.0f,-1.0f, // triangle 1 : begin
 	-1.0f,-1.0f, 1.0f,
 	-1.0f, 1.0f, 1.0f, // triangle 1 : end
@@ -168,18 +169,57 @@ int main(void)
 
 	};
 	
+	static const float uvdata[] = {
+	0.000059f, 1.0f - 0.000004f,
+	0.000103f, 1.0f - 0.336048f,
+	0.335973f, 1.0f - 0.335903f,
+	1.000023f, 1.0f - 0.000013f,
+	0.667979f, 1.0f - 0.335851f,
+	0.999958f, 1.0f - 0.336064f,
+	0.667979f, 1.0f - 0.335851f,
+	0.336024f, 1.0f - 0.671877f,
+	0.667969f, 1.0f - 0.671889f,
+	1.000023f, 1.0f - 0.000013f,
+	0.668104f, 1.0f - 0.000013f,
+	0.667979f, 1.0f - 0.335851f,
+	0.000059f, 1.0f - 0.000004f,
+	0.335973f, 1.0f - 0.335903f,
+	0.336098f, 1.0f - 0.000071f,
+	0.667979f, 1.0f - 0.335851f,
+	0.335973f, 1.0f - 0.335903f,
+	0.336024f, 1.0f - 0.671877f,
+	1.000004f, 1.0f - 0.671847f,
+	0.999958f, 1.0f - 0.336064f,
+	0.667979f, 1.0f - 0.335851f,
+	0.668104f, 1.0f - 0.000013f,
+	0.335973f, 1.0f - 0.335903f,
+	0.667979f, 1.0f - 0.335851f,
+	0.335973f, 1.0f - 0.335903f,
+	0.668104f, 1.0f - 0.000013f,
+	0.336098f, 1.0f - 0.000071f,
+	0.000103f, 1.0f - 0.336048f,
+	0.000004f, 1.0f - 0.671870f,
+	0.336024f, 1.0f - 0.671877f,
+	0.000103f, 1.0f - 0.336048f,
+	0.336024f, 1.0f - 0.671877f,
+	0.335973f, 1.0f - 0.335903f,
+	0.667969f, 1.0f - 0.671889f,
+	1.000004f, 1.0f - 0.671847f,
+	0.667979f, 1.0f - 0.335851f
+	};
+
+
 	unsigned int positionbuffer;
 	unsigned int colorbuffer;
 
-	//GL_ARRAY_BUFFER specifies that the buffer will be used as a source for vertex data, but
-	//the connection is only made when glVertexAttribPointer is called
 
 	VertexBuffer vbpos(positions, 108 * sizeof(float));
-	
 	VertexBuffer vbcol(colors, 108 * sizeof(float));
+	VertexBuffer vbuv(uvdata, 108 * sizeof(float));
 
 
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) == 0 && !glfwWindowShouldClose(window)) {
+
 		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT);
 
@@ -201,21 +241,34 @@ int main(void)
 			(void*)0            // array buffer offset
 		);
 
+		//glEnableVertexAttribArray(1);
+		//vbcol.Bind();
+		//glVertexAttribPointer(
+		//	1,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+		//	3,                  // size
+		//	GL_FLOAT,           // type
+		//	GL_FALSE,           // normalized?
+		//	0,                  // stride
+		//	(void*)0            // array buffer offset
+		//);
+
 		glEnableVertexAttribArray(1);
-		vbcol.Bind();
+		vbuv.Bind();
 		glVertexAttribPointer(
 			1,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-			3,                  // size
+			2,                  // size
 			GL_FLOAT,           // type
 			GL_FALSE,           // normalized?
 			0,                  // stride
 			(void*)0            // array buffer offset
 		);
 
+
 		// Draw the triangle !
 		glDrawArrays(GL_TRIANGLES, 0, 12 * 3); // 3 indices starting at 0 -> 12 triangles -> 6 squares
 
 		glDisableVertexAttribArray(0);
+		
 
 		// Swap buffers
 		glfwSwapBuffers(window);
