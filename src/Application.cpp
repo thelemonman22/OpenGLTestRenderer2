@@ -15,6 +15,7 @@ using namespace glm;
 #include "LoadShaders.h"
 #include "VertexBuffer.h"
 #include "BMPLoader.h"
+#include "ViewController.h"
 
 int main(void)
 {
@@ -85,6 +86,7 @@ int main(void)
 	//Our MVP, matrix multiplication is reverse, so this executes "Model -> View -> Projection"
 	glm::mat4 MVP = Projection * View * Model;
 	
+	//Convuluted naming?? fix dis 
 	unsigned int Texture = BMPLoader("res\\textures\\uvtemplate.bmp").getTextureID();
 
 	unsigned int TextureID = glGetUniformLocation(programID, "myTextureSampler");
@@ -217,6 +219,8 @@ int main(void)
 	VertexBuffer vbcol(colors, 108 * sizeof(float));
 	VertexBuffer vbuv(uvdata, 108 * sizeof(float));
 
+	ViewController view_controller(window);
+	glEnable(GL_CULL_FACE);
 
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) == 0 && !glfwWindowShouldClose(window)) {
 
@@ -226,6 +230,7 @@ int main(void)
 		// Use our shader
 		glUseProgram(programID);
 
+		MVP = view_controller.computeMatricesFromInputs();
 		//Send our transformation to the curently bound shader in the MVP uniform
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
@@ -268,7 +273,6 @@ int main(void)
 		glDrawArrays(GL_TRIANGLES, 0, 12 * 3); // 3 indices starting at 0 -> 12 triangles -> 6 squares
 
 		glDisableVertexAttribArray(0);
-		
 
 		// Swap buffers
 		glfwSwapBuffers(window);

@@ -150,11 +150,13 @@
     <ClCompile Include="src\LoadShaders.cpp" />
     <ClCompile Include="src\Testing.cpp" />
     <ClCompile Include="src\VertexBuffer.cpp" />
+    <ClCompile Include="src\ViewControlllercpp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\BMPLoader.h" />
     <ClInclude Include="src\LoadShaders.h" />
     <ClInclude Include="src\VertexBuffer.h" />
+    <ClInclude Include="src\ViewController.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

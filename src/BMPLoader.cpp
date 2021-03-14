@@ -4,6 +4,10 @@
 
 #include "BMPLoader.h"
 
+/*
+TODO: Rename class to loadTextures or something, setup so that it also supports .DDS files (compressed files)
+*/
+
 BMPLoader::BMPLoader(const char* imagepath) 
 {
 	if (readFile(imagepath)) 
@@ -12,8 +16,12 @@ BMPLoader::BMPLoader(const char* imagepath)
 		glBindTexture(GL_TEXTURE_2D, m_TextureID);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		// When MAGnifying the image (no bigger mipmap available), use LINEAR filtering
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		// When MINifying the image, use a LINEAR blend of two mipmaps, each filtered LINEARLY too
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		// Generate mipmaps, by the way.
+		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 }
 
