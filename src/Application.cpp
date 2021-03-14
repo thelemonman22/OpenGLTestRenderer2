@@ -13,6 +13,7 @@ GLFWwindow* window;
 using namespace glm;
 
 #include "LoadShaders.h"
+#include "VertexBuffer.h"
 
 int main(void)
 {
@@ -173,13 +174,9 @@ int main(void)
 	//GL_ARRAY_BUFFER specifies that the buffer will be used as a source for vertex data, but
 	//the connection is only made when glVertexAttribPointer is called
 
-	glGenBuffers(1, &positionbuffer); 
-	glBindBuffer(GL_ARRAY_BUFFER, positionbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
-
-	glGenBuffers(1, &colorbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
+	VertexBuffer vbpos(positions, 108 * sizeof(float));
+	
+	VertexBuffer vbcol(colors, 108 * sizeof(float));
 
 
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) == 0 && !glfwWindowShouldClose(window)) {
@@ -194,7 +191,7 @@ int main(void)
 
 		// 1rst attribute buffer : vertices
 		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, positionbuffer);
+		vbpos.Bind();
 		glVertexAttribPointer(
 			0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
 			3,                  // size
@@ -205,7 +202,7 @@ int main(void)
 		);
 
 		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+		vbcol.Bind();
 		glVertexAttribPointer(
 			1,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
 			3,                  // size

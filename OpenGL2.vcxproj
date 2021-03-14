@@ -146,13 +146,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
-    <ClCompile Include="src\GenBindBuff.cpp" />
     <ClCompile Include="src\LoadShaders.cpp" />
     <ClCompile Include="src\Testing.cpp" />
+    <ClCompile Include="src\VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\GenBindBuff.h" />
     <ClInclude Include="src\LoadShaders.h" />
+    <ClInclude Include="src\VertexBuffer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

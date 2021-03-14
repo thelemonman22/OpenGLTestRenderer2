@@ -24,7 +24,7 @@
     <ClCompile Include="src\Testing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GenBindBuff.cpp">
+    <ClCompile Include="src\VertexBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -32,7 +32,7 @@
     <ClInclude Include="src\LoadShaders.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\GenBindBuff.h">
+    <ClInclude Include="src\VertexBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
