@@ -77,6 +77,7 @@ int main(void)
 		glm::vec3(0,0,0), //looks up the origin
 		glm::vec3(0,1,0) //Head is upright (set 0, -1, 0 to look upside-down);
 
+
 	);
 
 	//Model matrix :  an identity matrix (model will be at the origin)
@@ -180,6 +181,7 @@ int main(void)
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
 
+
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) == 0 && !glfwWindowShouldClose(window)) {
 		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -192,7 +194,7 @@ int main(void)
 
 		// 1rst attribute buffer : vertices
 		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, positionbuffer);
 		glVertexAttribPointer(
 			0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
 			3,                  // size
