@@ -36,7 +36,7 @@ int main(void)
 
 
 	// Open a window and create its OpenGL context
-	window = glfwCreateWindow(1024, 768, "Tutorial 02 - Red triangle", NULL, NULL);
+	window = glfwCreateWindow(1024, 768, "OpenGL", NULL, NULL);
 	if (window == NULL) {
 		fprintf(stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n");
 		getchar();
@@ -68,23 +68,11 @@ int main(void)
 	unsigned int programID = LoadShaders("res\\shaders\\VertexShader.txt", "res\\shaders\\FragmentShader.txt");
 	unsigned int MatrixID = glGetUniformLocation(programID, "MVP");
 
-	//Projection matrix : 45 field of view, 4:3 aspect ratio, display range : 0.1 units to 100 units;
-	glm::mat4 Projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
-	// Or, for an ortho camera :
-	//glm::mat4 Projection = glm::ortho(-10.0f,10.0f,-10.0f,10.0f,0.0f,100.0f); // In world coordinates
 
-	//Camera Matrix
-	glm::mat4 View = glm::lookAt(
-		glm::vec3(4,3,3),  //Camera is at 4,3,3 in world space
-		glm::vec3(0,0,0), //looks up the origin
-		glm::vec3(0,1,0) //Head is upright (set 0, -1, 0 to look upside-
-	);
-
-	//Model matrix :  an identity matrix (model will be at the origin)
-	glm::mat4 Model = glm::mat4(1.0f);
+	ViewController view_controller(window);
 
 	//Our MVP, matrix multiplication is reverse, so this executes "Model -> View -> Projection"
-	glm::mat4 MVP = Projection * View * Model;
+	glm::mat4 MVP = view_controller.computeMatricesFromInputs();
 	
 	//Convuluted naming?? fix dis 
 	unsigned int Texture = BMPLoader("res\\textures\\uvtemplate.bmp").getTextureID();
@@ -219,7 +207,6 @@ int main(void)
 	VertexBuffer vbcol(colors, 108 * sizeof(float));
 	VertexBuffer vbuv(uvdata, 108 * sizeof(float));
 
-	ViewController view_controller(window);
 	glEnable(GL_CULL_FACE);
 
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) == 0 && !glfwWindowShouldClose(window)) {

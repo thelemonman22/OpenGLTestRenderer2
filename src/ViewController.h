@@ -12,10 +12,12 @@ private:
 	float horizontalAngle;
 	float verticalAngle;
 	float initialFoV;
-
 	float speed;
 	float mouseSpeed;
 	double xpos, ypos;
+
+	int windowHeight, windowLength;
+
 
 public:
 	ViewController(GLFWwindow* window);

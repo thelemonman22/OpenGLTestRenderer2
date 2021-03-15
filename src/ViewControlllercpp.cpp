@@ -10,9 +10,10 @@ ViewController::ViewController(GLFWwindow* window)
 	initialFoV = 45.0f;
 	speed = 3.0f; // 3 units / second
 	mouseSpeed = 0.005f;
-	
 	glfwGetCursorPos(window, &xpos, &ypos);
-	
+
+	glfwGetWindowSize(wind, &windowLength, &windowHeight);
+	glfwSetInputMode(wind, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 glm::mat4 ViewController::computeMatricesFromInputs() {
@@ -29,11 +30,11 @@ glm::mat4 ViewController::computeMatricesFromInputs() {
 	glfwGetCursorPos(wind, &xpos, &ypos);
 
 	// Reset mouse position for next frame
-	glfwSetCursorPos(wind, 1024 / 2, 768 / 2);
+	glfwSetCursorPos(wind, windowLength / 2, windowHeight / 2);
 
 	// Compute new orientation
-	horizontalAngle += mouseSpeed * float(1024 / 2 - xpos);
-	verticalAngle += mouseSpeed * float(768 / 2 - ypos);
+	horizontalAngle += mouseSpeed * float(windowLength / 2 - xpos);
+	verticalAngle += mouseSpeed * float(windowHeight / 2 - ypos);
 
 	// Direction : Spherical coordinates to Cartesian coordinates conversion
 	glm::vec3 direction(
@@ -68,7 +69,14 @@ glm::mat4 ViewController::computeMatricesFromInputs() {
 	if (glfwGetKey(wind, GLFW_KEY_A) == GLFW_PRESS) {
 		position -= right * deltaTime * speed;
 	}
-
+	// Strage up
+	if (glfwGetKey(wind, GLFW_KEY_E) == GLFW_PRESS) {
+		position += up * deltaTime * speed;
+	}
+	//Strafe down
+	if (glfwGetKey(wind, GLFW_KEY_Q) == GLFW_PRESS) {
+		position -= up * deltaTime * speed;
+	}
 	float FoV = initialFoV;// - 5 * glfwGetMouseWheel(); // Now GLFW 3 requires setting up a callback for this. It's a bit too complicated for this beginner's tutorial, so it's disabled instead.
 
 	// Projection matrix : 45� Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
