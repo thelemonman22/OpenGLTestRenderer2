@@ -1,5 +1,6 @@
 ﻿#include "ViewController.h"
 #include "GLFW/glfw3.h"
+#include <iostream>
 
 ViewController::ViewController(GLFWwindow* window)
 {
@@ -9,7 +10,7 @@ ViewController::ViewController(GLFWwindow* window)
 	verticalAngle = 0.0f;
 	initialFoV = 45.0f;
 	speed = 3.0f; // 3 units / second
-	mouseSpeed = 0.005f;
+	mouseSpeed = 0.003f;
 	glfwGetCursorPos(window, &xpos, &ypos);
 
 	glfwGetWindowSize(wind, &windowLength, &windowHeight);
@@ -17,6 +18,10 @@ ViewController::ViewController(GLFWwindow* window)
 }
 
 glm::mat4 ViewController::computeMatricesFromInputs() {
+
+	/*
+		TODO: Set so that the camera can go upside down
+	*/
 
 	// glfwGetTime is called only once, the first time this function is called
 	static double lastTime = glfwGetTime();
@@ -77,7 +82,7 @@ glm::mat4 ViewController::computeMatricesFromInputs() {
 	if (glfwGetKey(wind, GLFW_KEY_Q) == GLFW_PRESS) {
 		position -= up * deltaTime * speed;
 	}
-	float FoV = initialFoV;// - 5 * glfwGetMouseWheel(); // Now GLFW 3 requires setting up a callback for this. It's a bit too complicated for this beginner's tutorial, so it's disabled instead.
+	float FoV = initialFoV;// - 5 * glfwGetMouseWheel(); // Now GLFW 3 requires setting up a callback for this. It's a bit too complicated for this beginner's tutorial, so it's disabled instead
 
 	// Projection matrix : 45� Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
 	glm::mat4 ProjectionMatrix = glm::perspective(glm::radians(FoV), 4.0f / 3.0f, 0.1f, 100.0f);

@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\OBJLoader.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\BMPLoader.cpp" />
     <ClCompile Include="src\LoadShaders.cpp" />
@@ -153,6 +154,7 @@
     <ClCompile Include="src\ViewControlllercpp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\OBJLoader.h" />
     <ClInclude Include="src\BMPLoader.h" />
     <ClInclude Include="src\LoadShaders.h" />
     <ClInclude Include="src\VertexBuffer.h" />

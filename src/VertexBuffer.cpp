@@ -11,6 +11,26 @@ VertexBuffer::VertexBuffer(const void* data, unsigned int size)
 
 }
 
+VertexBuffer::VertexBuffer(std::vector<glm::vec3> &data)
+{
+	//GL_ARRAY_BUFFER specifies that the buffer will be used as a source for vertex data, but
+	//the connection is only made when glVertexAttribPointer is called
+	glGenBuffers(1, &m_RendererID);
+	glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
+	glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::vec3), &data, GL_STATIC_DRAW);
+
+}
+
+VertexBuffer::VertexBuffer(std::vector<glm::vec2> &data)
+{
+	//GL_ARRAY_BUFFER specifies that the buffer will be used as a source for vertex data, but
+	//the connection is only made when glVertexAttribPointer is called
+	glGenBuffers(1, &m_RendererID);
+	glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
+	glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::vec2), &data, GL_STATIC_DRAW);
+
+}
+
 VertexBuffer::~VertexBuffer()
 {
 	(glDeleteBuffers(1, &m_RendererID));
