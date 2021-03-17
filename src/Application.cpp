@@ -1,4 +1,3 @@
-// Include standard headers
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
@@ -6,17 +5,17 @@
 #include <GLFW/glfw3.h>
 #include <windows.h>
 
-GLFWwindow* window;
-
-// Include GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
 #include "LoadShaders.h"
 #include "VertexBuffer.h"
-#include "BMPLoader.h"
+#include "Texture.h"
 #include "ViewController.h"
 #include "OBJLoader.h"
+#include "vboindexer.h"
+#include "BMPLoader.h"
+
+GLFWwindow* window;
 
 int main(void)
 {
@@ -39,7 +38,7 @@ int main(void)
 	// Open a window and create its OpenGL context
 	window = glfwCreateWindow(1024, 768, "OpenGL", NULL, NULL);
 	if (window == NULL) {
-		fprintf(stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n");
+		fprintf(stderr, "Failed to open GLFW window.");
 		getchar();
 		glfwTerminate();
 		return -1;
@@ -59,7 +58,7 @@ int main(void)
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
 	// Dark blue background
-	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+	glClearColor(0.1f, 0.1f, 0.5f, 0.0f);
 
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
@@ -69,15 +68,13 @@ int main(void)
 	unsigned int programID = LoadShaders("res\\shaders\\VertexShader.txt", "res\\shaders\\FragmentShader.txt");
 	unsigned int MatrixID = glGetUniformLocation(programID, "MVP");
 
-
+	
 	ViewController view_controller(window);
 
 	//Our MVP, matrix multiplication is reverse, so this executes "Model -> View -> Projection"
 	glm::mat4 MVP = view_controller.computeMatricesFromInputs();
 	
-	//Convuluted naming?? fix dis 
-	unsigned int Texture = BMPLoader("res\\textures\\Developing Dripist.bmp").getTextureID();
-
+	
 	unsigned int TextureID = glGetUniformLocation(programID, "myTextureSampler");
 	
 	std::vector <glm::vec3> vertices;
@@ -85,8 +82,11 @@ int main(void)
 	std::vector <glm::vec3> normals;
 	bool res = loadOBJ("res\\models\\cube.obj", vertices, uvs, normals);
 
-	//unsigned int positionbuffer;
-	//unsigned int colorbuffer;
+	std::vector<unsigned short> indices;
+	std::vector<glm::vec3> indexed_vertices;
+	std::vector<glm::vec2> indexed_uvs;
+	std::vector<glm::vec3> indexed_normals;
+	indexVBO(vertices, uvs, normals, indices, indexed_vertices, indexed_uvs, indexed_normals);
 
 	GLuint vertexbuffer;
 	glGenBuffers(1, &vertexbuffer);
@@ -98,7 +98,10 @@ int main(void)
 	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), &uvs[0], GL_STATIC_DRAW);
 
-
+	unsigned int elementbuffer;
+	glGenBuffers(1, &elementbuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 	//VertexBuffer vbpos(vertices);
 	//VertexBuffer vbuv(uvs);
 
@@ -114,6 +117,10 @@ int main(void)
 
 	double lastTime = glfwGetTime();
 	int nbFrames = 0;
+
+	Texture texture("res\\textures\\uvtemplate.bmp");
+	texture.Bind();
+	//BMPLoader bmp_loader("res\\textures\\uvtemplate.bmp");
 
 	//Decreases GPU usage??
 	glfwSwapInterval(1);
@@ -143,23 +150,12 @@ int main(void)
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 		glVertexAttribPointer(
 			0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-			3,                  // size
+			3,                  // size - 3 for xyz if it was 2d it would be 2, xy
 			GL_FLOAT,           // type
 			GL_FALSE,           // normalized?
-			0,                  // stride
+			3 * sizeof(float),                  // stride 
 			(void*)0            // array buffer offset
 		);
-
-		//glEnableVertexAttribArray(1);
-		//vbcol.Bind();
-		//glVertexAttribPointer(
-		//	1,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-		//	3,                  // size
-		//	GL_FLOAT,           // type
-		//	GL_FALSE,           // normalized?
-		//	0,                  // stride
-		//	(void*)0            // array buffer offset
-		//);
 
 		glEnableVertexAttribArray(1);
 		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
@@ -168,10 +164,11 @@ int main(void)
 			2,                  // size
 			GL_FLOAT,           // type
 			GL_FALSE,           // normalized?
-			0,                  // stride
+			2 * sizeof(float),                  // stride, how many bytes into the buffer is this v
 			(void*)0            // array buffer offset
 		);
 
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 
 		// Draw the triangle !
 		glDrawArrays(GL_TRIANGLES, 0, 12 * 3); // 3 indices starting at 0 -> 12 triangles -> 6 squares
@@ -185,6 +182,8 @@ int main(void)
 	}
 	// Cleanup VBO
 	glDeleteBuffers(1, &vertexbuffer);
+	glDeleteBuffers(1, &uvbuffer);
+	glDeleteBuffers(1, &elementbuffer);
 	glDeleteVertexArrays(1, &VertexArrayID);
 	glDeleteProgram(programID);
 

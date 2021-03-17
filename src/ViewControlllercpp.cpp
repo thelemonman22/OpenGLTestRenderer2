@@ -1,18 +1,21 @@
 ﻿#include "ViewController.h"
 #include "GLFW/glfw3.h"
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
-ViewController::ViewController(GLFWwindow* window)
+ViewController::ViewController(GLFWwindow* window) : maxViewAngle(1.55)
 {
 	wind = window;
 	position = glm::vec3(0, 0, 5);
 	horizontalAngle = 3.14f;
 	verticalAngle = 0.0f;
+	
 	initialFoV = 45.0f;
 	speed = 3.0f; // 3 units / second
-	mouseSpeed = 0.003f;
-	glfwGetCursorPos(window, &xpos, &ypos);
+	mouseSpeed = 0.002f;
 
+	glfwGetCursorPos(window, &xpos, &ypos);
 	glfwGetWindowSize(wind, &windowLength, &windowHeight);
 	glfwSetInputMode(wind, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
@@ -40,6 +43,9 @@ glm::mat4 ViewController::computeMatricesFromInputs() {
 	// Compute new orientation
 	horizontalAngle += mouseSpeed * float(windowLength / 2 - xpos);
 	verticalAngle += mouseSpeed * float(windowHeight / 2 - ypos);
+	std::cout << verticalAngle << std::endl;
+	if (verticalAngle > maxViewAngle) verticalAngle = maxViewAngle;
+	if (verticalAngle < -1 * maxViewAngle) verticalAngle = -1 * maxViewAngle;
 
 	// Direction : Spherical coordinates to Cartesian coordinates conversion
 	glm::vec3 direction(
@@ -82,9 +88,10 @@ glm::mat4 ViewController::computeMatricesFromInputs() {
 	if (glfwGetKey(wind, GLFW_KEY_Q) == GLFW_PRESS) {
 		position -= up * deltaTime * speed;
 	}
-	float FoV = initialFoV;// - 5 * glfwGetMouseWheel(); // Now GLFW 3 requires setting up a callback for this. It's a bit too complicated for this beginner's tutorial, so it's disabled instead
+	//implement Scrolling later
+	float FoV = initialFoV;
 
-	// Projection matrix : 45� Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
+	// Projection matrix : 45 Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
 	glm::mat4 ProjectionMatrix = glm::perspective(glm::radians(FoV), 4.0f / 3.0f, 0.1f, 100.0f);
 	// Camera matrix
 	glm::mat4 ViewMatrix = glm::lookAt(
@@ -94,8 +101,33 @@ glm::mat4 ViewController::computeMatricesFromInputs() {
 	);
 	glm::mat4 ModelMatrix = glm::mat4(1.0f);
 
+	glm::vec4 vec(0.1f, 0.0f, 0.0f, 1.0f);
+
+	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(1.0f, 1.0f, 0.0f));
+
 	glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 	// For the next frame, the "last time" will be "now"
 	lastTime = currentTime;
 	return MVP;
 }
+
+float ViewController::getMouseSpeed()
+{
+	return mouseSpeed;
+}
+
+void ViewController::setMouseSpeed(float newMouseSpeed)
+{
+	mouseSpeed = newMouseSpeed;
+}
+
+float ViewController::getFoV()
+{
+	return initialFoV;
+}
+
+void ViewController::setFoV(float newFoV)
+{
+	initialFoV = newFoV;
+}
+

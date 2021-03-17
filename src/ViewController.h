@@ -7,7 +7,7 @@
 class ViewController {
 private:
 	GLFWwindow* wind;
-
+	const float maxViewAngle;
 	glm::vec3 position;
 	float horizontalAngle;
 	float verticalAngle;
@@ -22,5 +22,9 @@ private:
 public:
 	ViewController(GLFWwindow* window);
 	glm::mat4 computeMatricesFromInputs();
+	float getMouseSpeed();
+	void setMouseSpeed(float newMouseSpeed);
+	float getFoV();
+	void setFoV(float newFoV);
 
 };

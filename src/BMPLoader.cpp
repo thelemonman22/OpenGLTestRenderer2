@@ -4,10 +4,6 @@
 
 #include "BMPLoader.h"
 
-/*
-TODO: Rename class to loadTextures or something, setup so that it also supports .DDS files (compressed files)
-*/
-
 BMPLoader::BMPLoader(const char* imagepath) 
 {
 	if (readFile(imagepath)) 

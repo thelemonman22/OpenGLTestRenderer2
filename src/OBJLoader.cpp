@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string>
 #include <cstring>
-
+#include <assimp\anim.h>
 #include <glm/glm.hpp>
 
 #include "objloader.h"
